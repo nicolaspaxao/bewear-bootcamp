@@ -18,8 +18,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 const formSchema = z
@@ -52,12 +54,30 @@ const SignUpForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log("FORMULARIO VALIDADO E ENVIADO!");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await authClient.signUp.email({
+      name: values.name, // required
+      email: values.email, // required
+      password: values.password, // required
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Conta criada com sucesso!");
+        },
+        onError: (error) => {
+          if (error.error.code === "USER_ALREADY_EXISTS") {
+            toast.error("E-mail já cadastrado.");
 
-    console.log(values);
+            form.setError("email", {
+              message: "E-email já cadastrado",
+            });
+
+            return;
+          }
+
+          toast.error(error.error.message);
+        },
+      },
+    });
   }
 
   return (

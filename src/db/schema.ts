@@ -8,12 +8,6 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 
-export const usersTable = pgTable("user", {
-  id: uuid().primaryKey().defaultRandom(),
-  name: text().notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
 export const categoryTable = pgTable("category", {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
